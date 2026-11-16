@@ -19,7 +19,20 @@ import ZoneFilterMenu from "./ZoneFilterMenu";
 const AMBA_CENTER: [number, number] = [-34.6037, -58.3816];
 const AMBA_DEFAULT_ZOOM = 12;
 
-const LEAF_PIN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`;
+const ESRI_WORLD_TOPO_URL =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
+const OPENTOPOMAP_URL = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
+
+const buildParkSignPinSvg = (zoneColor: string) => `
+<svg viewBox="0 0 42 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M7 6C7 4.34315 8.34315 3 10 3H32C33.6569 3 35 4.34315 35 6V26.5C35 31.8 27.5 38.2 21 44.2C14.5 38.2 7 31.8 7 26.5V6Z" stroke="#faf7f2" stroke-width="6.4" stroke-linejoin="round"/>
+  <path d="M7 6C7 4.34315 8.34315 3 10 3H32C33.6569 3 35 4.34315 35 6V26.5C35 31.8 27.5 38.2 21 44.2C14.5 38.2 7 31.8 7 26.5V6Z" fill="#c8a96e" stroke="#3d2b1f" stroke-width="2.4" stroke-linejoin="round"/>
+  <rect x="10.5" y="6.5" width="21" height="21" rx="4" fill="#faf7f2" fill-opacity="0.32" stroke="#3d2b1f" stroke-width="1.2"/>
+  <path d="M21 9.5L15.5 17.5H19L14.5 23.5H27.5L23 17.5H26.5L21 9.5Z" fill="#2d4a2d" stroke="#3d2b1f" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M21 23.5V27" stroke="#3d2b1f" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="21" cy="34.5" r="3.2" fill="${zoneColor}" stroke="#3d2b1f" stroke-width="1.2"/>
+</svg>
+`;
 
 const normalize = (text: string) =>
   text
@@ -75,7 +88,7 @@ const ReservasMap = () => {
     };
   }, []);
 
-  // Inicializar mapa Leaflet centrado en Buenos Aires y AMBA
+  // Inicializar mapa Leaflet con Esri World Topo (atenuado visualmente) y respaldo OpenTopoMap
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
@@ -86,16 +99,26 @@ const ReservasMap = () => {
 
     L.control.zoom({ position: "bottomleft" }).addTo(map);
 
-    lightTilesRef.current = L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        attribution: "&copy; OpenStreetMap contributors",
+    let switchedToFallback = false;
+    const topoLayer = L.tileLayer(ESRI_WORLD_TOPO_URL, {
+      maxZoom: 18,
+      className: "topo-tile-layer",
+      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community",
+    });
+
+    topoLayer.on("tileerror", () => {
+      if (!switchedToFallback) {
+        switchedToFallback = true;
+        topoLayer.setUrl(OPENTOPOMAP_URL);
       }
-    ).addTo(map);
+    });
+
+    lightTilesRef.current = topoLayer.addTo(map);
 
     darkTilesRef.current = L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
+        maxZoom: 19,
         attribution: "&copy; OpenStreetMap &copy; CARTO",
       }
     );
@@ -134,13 +157,13 @@ const ReservasMap = () => {
     });
   }, [reservas, activeZona, searchQuery]);
 
-  const createPinIcon = useCallback((color: string) => {
+  const createPinIcon = useCallback((zoneColor: string) => {
     return L.divIcon({
       className: "custom-div-icon",
-      html: `<div class="reserva-pin" style="background:${color}">${LEAF_PIN_SVG}</div>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 34],
-      popupAnchor: [0, -30],
+      html: `<div class="reserva-pin-sign">${buildParkSignPinSvg(zoneColor)}</div>`,
+      iconSize: [38, 44],
+      iconAnchor: [19, 43],
+      popupAnchor: [0, -38],
     });
   }, []);
 
@@ -159,7 +182,10 @@ const ReservasMap = () => {
     filteredReservas.forEach((reserva) => {
       const color = ZONA_COLORES[reserva.zona];
       const icon = createPinIcon(color);
-      const marker = L.marker(reserva.coordenadas, { icon });
+      const marker = L.marker(reserva.coordenadas, {
+        icon,
+        zIndexOffset: 500,
+      });
 
       const popupDiv = document.createElement("div");
       const root = createRoot(popupDiv);
@@ -250,9 +276,9 @@ const ReservasMap = () => {
         <button
           type="button"
           onClick={toggleDarkMode}
-          title={isDark ? "Cambiar a mapa claro" : "Cambiar a mapa nocturno"}
-          aria-label={isDark ? "Cambiar a mapa claro" : "Cambiar a mapa nocturno"}
-          className="w-11 h-11 rounded-full bg-card/95 backdrop-blur-md border border-border shadow-md flex items-center justify-center text-foreground hover:bg-muted/70 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          title={isDark ? "Cambiar a mapa topográfico" : "Cambiar a mapa nocturno"}
+          aria-label={isDark ? "Cambiar a mapa topográfico" : "Cambiar a mapa nocturno"}
+          className="w-11 h-11 rounded-full bg-[#faf7f2] dark:bg-[#2d4a2d] border border-[#3d2b1f]/25 dark:border-[#c8a96e]/40 shadow-md flex items-center justify-center text-[#2d4a2d] dark:text-[#faf7f2] hover:bg-[#f5f0e8] dark:hover:bg-[#4a7c4a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a7c4a]"
         >
           {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
@@ -262,7 +288,7 @@ const ReservasMap = () => {
           onClick={handleLocateMe}
           title="Centrar en mi ubicación"
           aria-label="Centrar en mi ubicación"
-          className="w-11 h-11 rounded-full bg-card/95 backdrop-blur-md border border-border shadow-md flex items-center justify-center text-foreground hover:bg-muted/70 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-11 h-11 rounded-full bg-[#faf7f2] dark:bg-[#2d4a2d] border border-[#3d2b1f]/25 dark:border-[#c8a96e]/40 shadow-md flex items-center justify-center text-[#2d4a2d] dark:text-[#faf7f2] hover:bg-[#f5f0e8] dark:hover:bg-[#4a7c4a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a7c4a]"
         >
           <LocateFixed className="w-5 h-5" />
         </button>
@@ -275,17 +301,17 @@ const ReservasMap = () => {
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-card/95 backdrop-blur-md border border-border shadow-lg">
-            <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-primary shrink-0 mt-0.5">
+          <div className="flex items-start gap-3 px-4 py-3 rounded-2xl bg-[#faf7f2]/95 dark:bg-[#2d4a2d]/95 backdrop-blur-md border border-[#3d2b1f]/25 dark:border-[#c8a96e]/40 border-t-4 border-t-[#4a7c4a] shadow-lg">
+            <div className="w-9 h-9 rounded-xl bg-[#f5f0e8] dark:bg-[#4a7c4a]/50 border border-[#c8a96e]/50 flex items-center justify-center text-[#2d4a2d] dark:text-[#faf7f2] shrink-0 mt-0.5">
               <Trees className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
               {!isConfigured ? (
                 <>
-                  <p className="text-xs sm:text-sm font-semibold text-foreground">
+                  <p className="text-xs sm:text-sm font-semibold text-[#2d4a2d] dark:text-[#faf7f2]">
                     Sin conexión a Supabase
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                  <p className="text-xs text-[#3d2b1f]/80 dark:text-[#c8a96e] mt-0.5 leading-relaxed">
                     Completá{" "}
                     <code className="font-mono text-[11px]">VITE_SUPABASE_URL</code> y{" "}
                     <code className="font-mono text-[11px]">VITE_SUPABASE_ANON_KEY</code>{" "}
@@ -294,19 +320,19 @@ const ReservasMap = () => {
                 </>
               ) : loadError ? (
                 <>
-                  <p className="text-xs sm:text-sm font-semibold text-foreground">
+                  <p className="text-xs sm:text-sm font-semibold text-[#2d4a2d] dark:text-[#faf7f2]">
                     Error de conexión
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                  <p className="text-xs text-[#3d2b1f]/80 dark:text-[#c8a96e] mt-0.5 leading-relaxed">
                     {loadError}
                   </p>
                 </>
               ) : reservas.length === 0 ? (
                 <>
-                  <p className="text-xs sm:text-sm font-semibold text-foreground">
+                  <p className="text-xs sm:text-sm font-semibold text-[#2d4a2d] dark:text-[#faf7f2]">
                     Todavía no hay reservas cargadas
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                  <p className="text-xs text-[#3d2b1f]/80 dark:text-[#c8a96e] mt-0.5 leading-relaxed">
                     Agregá registros en la tabla{" "}
                     <code className="font-mono text-[11px]">reservas</code> de tu
                     proyecto Supabase para verlas en el mapa.
@@ -315,10 +341,10 @@ const ReservasMap = () => {
               ) : (
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs sm:text-sm font-semibold text-foreground">
+                    <p className="text-xs sm:text-sm font-semibold text-[#2d4a2d] dark:text-[#faf7f2]">
                       Sin reservas en esta selección
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-[#3d2b1f]/80 dark:text-[#c8a96e] mt-0.5">
                       Probá cambiando la zona o limpiando la búsqueda.
                     </p>
                   </div>
@@ -328,7 +354,7 @@ const ReservasMap = () => {
                       setActiveZona("Todas");
                       setSearchQuery("");
                     }}
-                    className="min-h-[36px] px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap shrink-0"
+                    className="min-h-[36px] px-3 py-1.5 rounded-xl bg-[#c8a96e] text-[#3d2b1f] text-xs font-semibold hover:bg-[#be9b59] transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
                     Ver todas
                   </button>

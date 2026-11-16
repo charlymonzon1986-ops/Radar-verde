@@ -112,8 +112,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       onTouchStart={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center gap-2 min-h-[44px] px-3.5 rounded-2xl bg-card/95 backdrop-blur-md border border-border shadow-md focus-within:ring-2 focus-within:ring-ring transition-shadow">
-        <Search className="w-4 h-4 text-primary shrink-0" />
+      <div className="flex items-center gap-2.5 min-h-[44px] px-3.5 rounded-xl bg-[#faf7f2]/95 dark:bg-[#2d4a2d]/95 backdrop-blur-md border border-[#3d2b1f]/25 dark:border-[#c8a96e]/40 shadow-md focus-within:ring-2 focus-within:ring-[#4a7c4a] transition-shadow">
+        <Search className="w-4 h-4 text-[#2d4a2d] dark:text-[#c8a96e] shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -126,14 +126,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Buscar reserva ecológica o zona..."
           aria-label="Buscar reserva ecológica"
-          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none py-2"
+          className="w-full bg-transparent text-sm text-[#3d2b1f] dark:text-[#faf7f2] placeholder:text-[#3d2b1f]/55 dark:placeholder:text-[#c8a96e]/75 focus:outline-none py-2"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={handleClear}
             aria-label="Limpiar búsqueda"
-            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors cursor-pointer shrink-0"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-[#3d2b1f]/65 dark:text-[#c8a96e] hover:text-[#3d2b1f] dark:hover:text-[#faf7f2] hover:bg-[#f5f0e8] dark:hover:bg-[#4a7c4a]/50 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -141,10 +141,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
       </div>
 
       {showDropdown && (
-        <div className="mt-2 rounded-2xl bg-card/98 backdrop-blur-md border border-border shadow-xl overflow-hidden">
+        <div className="mt-2 rounded-xl bg-[#faf7f2] dark:bg-[#2d4a2d] border border-[#3d2b1f]/25 dark:border-[#c8a96e]/40 shadow-xl overflow-hidden">
           <div
             ref={resultsListRef}
-            className="overflow-y-auto max-h-[280px] divide-y divide-border/70 custom-scrollbar"
+            className="overflow-y-auto max-h-[280px] divide-y divide-[#3d2b1f]/10 dark:divide-[#c8a96e]/20 custom-scrollbar"
           >
             {matchingReservas.length > 0 ? (
               matchingReservas.map((reserva, idx) => {
@@ -157,20 +157,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     onClick={() => handleSelect(reserva)}
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={`flex items-center gap-3 w-full px-3.5 py-2.5 text-left transition-colors cursor-pointer ${
-                      isSelected ? "bg-muted/80" : "hover:bg-muted/50"
+                      isSelected
+                        ? "bg-[#f5f0e8] dark:bg-[#4a7c4a]/60"
+                        : "hover:bg-[#f5f0e8]/80 dark:hover:bg-[#4a7c4a]/40"
                     }`}
                   >
                     <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[#faf7f2] border border-[#3d2b1f]/25 shrink-0"
                       style={{ backgroundColor: zonaColor }}
                     >
                       <MapPin className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-foreground truncate">
+                      <div className="text-sm font-semibold text-[#2d4a2d] dark:text-[#faf7f2] truncate">
                         {reserva.nombre}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 truncate">
+                      <div className="flex items-center gap-1.5 text-xs text-[#3d2b1f]/75 dark:text-[#c8a96e] mt-0.5 truncate">
                         <span>Zona {reserva.zona}</span>
                         {reserva.fotos.length > 0 && (
                           <>
@@ -188,10 +190,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
               })
             ) : (
               <div className="p-5 text-center">
-                <p className="text-sm font-semibold text-foreground">
+                <p className="text-sm font-semibold text-[#2d4a2d] dark:text-[#faf7f2]">
                   No se encontraron reservas
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-[#3d2b1f]/75 dark:text-[#c8a96e] mt-1">
                   {reservas.length === 0
                     ? "Todavía no hay reservas cargadas desde Supabase."
                     : `No hay coincidencias para "${searchQuery}".`}
@@ -199,7 +201,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="mt-3 inline-flex items-center justify-center min-h-[36px] px-4 py-1.5 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer"
+                  className="mt-3 inline-flex items-center justify-center min-h-[36px] px-4 py-1.5 rounded-xl text-xs font-semibold bg-[#c8a96e] text-[#3d2b1f] hover:bg-[#be9b59] transition-colors cursor-pointer"
                 >
                   Limpiar búsqueda
                 </button>

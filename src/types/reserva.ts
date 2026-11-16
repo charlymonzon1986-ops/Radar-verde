@@ -11,11 +11,11 @@ export const ZONAS_GEOGRAFICAS: readonly ZonaGeografica[] = [
 ] as const;
 
 export const ZONA_COLORES: Record<ZonaGeografica, string> = {
-  Norte: "#1B4D3E",
-  Sur: "#2E6F40",
-  Este: "#236B70",
-  Oeste: "#5A6E36",
-  Centro: "#8C5E2A",
+  Norte: "#4a7c4a",
+  Sur: "#6d9449",
+  Este: "#8faa5b",
+  Oeste: "#c8a96e",
+  Centro: "#a87e41",
 };
 
 export interface ReservaFoto {

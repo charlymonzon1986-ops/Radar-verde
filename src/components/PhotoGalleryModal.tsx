@@ -82,18 +82,18 @@ const PhotoGalleryModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-[2000] flex items-center justify-center bg-foreground/65 backdrop-blur-xs p-4"
+      className="fixed inset-0 z-[2000] flex items-center justify-center bg-[#3d2b1f]/60 backdrop-blur-xs p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
       role="dialog"
       aria-modal="true"
       aria-labelledby="gallery-modal-title"
     >
-      <div className="bg-card text-card-foreground border border-border rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <div className="sticky top-0 bg-card border-b border-border p-4 flex items-start justify-between gap-3 z-10">
+      <div className="bg-[#faf7f2] text-[#3d2b1f] border border-[#d8ccb8] border-t-[6px] border-t-[#4a7c4a] rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="sticky top-0 bg-[#faf7f2] border-b border-[#d8ccb8] p-4 flex items-start justify-between gap-3 z-10">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+            <div className="flex items-center gap-2 text-xs font-medium text-[#3d2b1f]/75 mb-1">
               <span
-                className="w-2 h-2 rounded-full shrink-0"
+                className="w-2.5 h-2.5 rounded-full shrink-0 border border-[#3d2b1f]/25"
                 style={{ backgroundColor: zonaColor }}
                 aria-hidden="true"
               />
@@ -101,7 +101,7 @@ const PhotoGalleryModal = ({
             </div>
             <h2
               id="gallery-modal-title"
-              className="font-display text-lg font-bold text-foreground leading-snug"
+              className="font-display text-xl font-bold tracking-wide text-[#2d4a2d] leading-snug"
             >
               {reserva.nombre}
             </h2>
@@ -111,7 +111,7 @@ const PhotoGalleryModal = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar galería"
-            className="flex items-center justify-center w-9 h-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors cursor-pointer shrink-0"
+            className="flex items-center justify-center w-9 h-9 rounded-xl text-[#3d2b1f]/70 hover:text-[#2d4a2d] hover:bg-[#f5f0e8] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -119,19 +119,19 @@ const PhotoGalleryModal = ({
 
         <div className="p-4 space-y-5">
           <div>
-            <p className="text-xs font-semibold text-foreground mb-2.5">
+            <p className="text-xs font-semibold text-[#2d4a2d] mb-2.5">
               Galería de la reserva
             </p>
 
             <div className="grid grid-cols-2 gap-2.5 max-h-64 overflow-y-auto custom-scrollbar pr-0.5">
               {loading ? (
-                <p className="col-span-2 text-xs text-muted-foreground py-4 text-center">
+                <p className="col-span-2 text-xs text-[#3d2b1f]/70 py-4 text-center">
                   Cargando fotografías...
                 </p>
               ) : photos.length === 0 ? (
-                <div className="col-span-2 rounded-xl border border-dashed border-border bg-muted/40 py-6 px-4 text-center">
-                  <Camera className="w-5 h-5 text-muted-foreground mx-auto mb-1.5" />
-                  <p className="text-xs text-muted-foreground">
+                <div className="col-span-2 rounded-xl border border-dashed border-[#c8a96e] bg-[#f5f0e8] py-6 px-4 text-center">
+                  <Camera className="w-5 h-5 text-[#4a7c4a] mx-auto mb-1.5" />
+                  <p className="text-xs text-[#3d2b1f]/80">
                     Todavía no hay fotos cargadas para esta reserva.
                   </p>
                 </div>
@@ -141,7 +141,7 @@ const PhotoGalleryModal = ({
                   return (
                     <div key={foto.id} className="space-y-1">
                       {isBroken ? (
-                        <div className="w-full h-28 rounded-xl border border-border bg-muted/60 flex flex-col items-center justify-center gap-1 text-muted-foreground px-2 text-center">
+                        <div className="w-full h-28 rounded-xl border border-[#d8ccb8] bg-[#f5f0e8] flex flex-col items-center justify-center gap-1 text-[#3d2b1f]/70 px-2 text-center">
                           <ImageOff className="w-4 h-4" />
                           <span className="text-[11px]">Imagen no disponible</span>
                         </div>
@@ -153,11 +153,11 @@ const PhotoGalleryModal = ({
                           onError={() =>
                             setBrokenImages((prev) => new Set(prev).add(foto.id))
                           }
-                          className="w-full h-28 object-cover rounded-xl border border-border bg-muted/30"
+                          className="w-full h-28 object-cover rounded-xl border border-[#d8ccb8] bg-[#f5f0e8]"
                         />
                       )}
                       {foto.autor && (
-                        <p className="text-[11px] text-muted-foreground truncate px-0.5">
+                        <p className="text-[11px] text-[#3d2b1f]/75 truncate px-0.5">
                           Por {foto.autor}
                         </p>
                       )}
@@ -168,13 +168,13 @@ const PhotoGalleryModal = ({
             </div>
           </div>
 
-          <div className="border-t border-border pt-4 space-y-3">
-            <p className="text-xs font-semibold text-foreground">
+          <div className="border-t border-[#d8ccb8] pt-4 space-y-3">
+            <p className="text-xs font-semibold text-[#2d4a2d]">
               Subí una foto de esta reserva
             </p>
 
             {!isSupabaseConfigured && (
-              <p className="text-xs text-muted-foreground bg-muted/60 border border-border rounded-xl px-3 py-2.5 leading-relaxed">
+              <p className="text-xs text-[#3d2b1f]/85 bg-[#f5f0e8] border border-[#c8a96e]/60 rounded-xl px-3 py-2.5 leading-relaxed">
                 La subida de fotos se habilitará al completar{" "}
                 <code className="font-mono text-[11px]">VITE_SUPABASE_URL</code> y{" "}
                 <code className="font-mono text-[11px]">VITE_SUPABASE_ANON_KEY</code>.
@@ -186,17 +186,17 @@ const PhotoGalleryModal = ({
               value={autor}
               onChange={(e) => setAutor(e.target.value)}
               placeholder="Tu nombre (opcional)"
-              className="w-full min-h-[40px] px-3 py-2 text-sm rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full min-h-[40px] px-3 py-2 text-sm rounded-xl border border-[#cbbda6] bg-white text-[#3d2b1f] placeholder:text-[#3d2b1f]/50 focus:outline-none focus:ring-2 focus:ring-[#4a7c4a]"
             />
 
             <label
               htmlFor="reserva-foto-input"
-              className="flex items-center justify-between gap-2 w-full min-h-[42px] px-3 py-2 rounded-xl border border-dashed border-input bg-background hover:bg-muted/40 transition-colors cursor-pointer text-xs text-muted-foreground"
+              className="flex items-center justify-between gap-2 w-full min-h-[42px] px-3 py-2 rounded-xl border border-dashed border-[#c8a96e] bg-[#f5f0e8] hover:bg-[#ebe3d3] transition-colors cursor-pointer text-xs text-[#3d2b1f]/80"
             >
               <span className="truncate">
                 {file ? file.name : "Seleccionar imagen (JPG, PNG, WebP)"}
               </span>
-              <Upload className="w-4 h-4 shrink-0 text-primary" />
+              <Upload className="w-4 h-4 shrink-0 text-[#2d4a2d]" />
               <input
                 id="reserva-foto-input"
                 type="file"
@@ -210,7 +210,7 @@ const PhotoGalleryModal = ({
               type="button"
               onClick={handleUpload}
               disabled={uploading || !file || !isSupabaseConfigured}
-              className="w-full min-h-[42px] py-2.5 px-4 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm transition-opacity hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
+              className="w-full min-h-[42px] py-2.5 px-4 rounded-xl bg-[#4a7c4a] text-[#faf7f2] font-semibold text-sm transition-colors hover:bg-[#2d4a2d] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
             >
               {uploading ? "Subiendo foto..." : "Subir foto"}
             </button>
