@@ -1,0 +1,198 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #F7F4EC;
+  --foreground: #1A241C;
+  --card: #FDFCF8;
+  --card-foreground: #1A241C;
+  --popover: #FDFCF8;
+  --popover-foreground: #1A241C;
+  --primary: #1B4D3E;
+  --primary-foreground: #FDFCF8;
+  --secondary: #2E6F40;
+  --secondary-foreground: #FDFCF8;
+  --muted: #E9EFE5;
+  --muted-foreground: #526354;
+  --accent: #D9E4D2;
+  --accent-foreground: #1A241C;
+  --destructive: #B43C2E;
+  --destructive-foreground: #FDFCF8;
+  --border: #DCE3D6;
+  --input: #D2DCCB;
+  --ring: #1B4D3E;
+  --radius: 0.75rem;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+.dark {
+  --background: #111A14;
+  --foreground: #EEF3EB;
+  --card: #17231B;
+  --card-foreground: #EEF3EB;
+  --popover: #17231B;
+  --popover-foreground: #EEF3EB;
+  --primary: #3C8D6B;
+  --primary-foreground: #F7F4EC;
+  --secondary: #4D9A62;
+  --secondary-foreground: #0D140F;
+  --muted: #213127;
+  --muted-foreground: #A6B8AA;
+  --accent: #273B2E;
+  --accent-foreground: #EEF3EB;
+  --destructive: #D45849;
+  --destructive-foreground: #FDFCF8;
+  --border: #2B3D31;
+  --input: #314739;
+  --ring: #4D9A62;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  font-family: var(--font-body) !important;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border-radius: 18px !important;
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 36px rgba(17, 26, 20, 0.16) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  min-width: 268px !important;
+  max-width: 320px !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--muted-foreground) !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 26px !important;
+  height: 26px !important;
+  font-size: 18px !important;
+  line-height: 26px !important;
+  border-radius: 9999px;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--foreground) !important;
+  background: var(--muted) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--card) !important;
+  box-shadow: 0 4px 10px rgba(17, 26, 20, 0.1) !important;
+}
+
+/* Custom botanical map pin */
+.custom-div-icon {
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+.reserva-pin {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2.5px solid #FDFCF8;
+  box-shadow: 0 3px 10px rgba(17, 26, 20, 0.3);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reserva-pin:hover {
+  transform: rotate(-45deg) scale(1.12);
+}
+
+.reserva-pin svg {
+  transform: rotate(45deg);
+  width: 15px;
+  height: 15px;
+  color: #FDFCF8;
+}
+
+/* Subtle scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reserva-pin {
+    transition: none;
+  }
+}

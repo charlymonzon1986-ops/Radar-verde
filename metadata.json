@@ -1,0 +1,6 @@
+{
+  "name": "Radar Verde",
+  "description": "Mapa interactivo de reservas ecológicas de Buenos Aires y AMBA",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
