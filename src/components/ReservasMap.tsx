@@ -16,11 +16,13 @@ import PhotoGalleryModal from "./PhotoGalleryModal";
 import SearchBar from "./SearchBar";
 import ZoneFilterMenu from "./ZoneFilterMenu";
 
-const AMBA_CENTER: [number, number] = [-34.6037, -58.3816];
-const AMBA_DEFAULT_ZOOM = 12;
+// Encuadre que incluye CABA, zona norte (Pilar, Maschwitz, Tigre), Campana y Laferrere
+const AMBA_CENTER: [number, number] = [-34.55, -58.65];
+const AMBA_DEFAULT_ZOOM = 10;
 
-const ESRI_WORLD_TOPO_URL =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
+// Terreno sombreado con vegetación y parques, sin nombres de calles (menos ruido visual)
+const ESRI_TERRAIN_URL =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}";
 const OPENTOPOMAP_URL = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
 
 const buildParkSignPinSvg = (zoneColor: string) => `
@@ -100,10 +102,11 @@ const ReservasMap = () => {
     L.control.zoom({ position: "bottomleft" }).addTo(map);
 
     let switchedToFallback = false;
-    const topoLayer = L.tileLayer(ESRI_WORLD_TOPO_URL, {
+    const topoLayer = L.tileLayer(ESRI_TERRAIN_URL, {
       maxZoom: 18,
+      maxNativeZoom: 13,
       className: "topo-tile-layer",
-      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community",
+      attribution: "Tiles &copy; Esri &mdash; Source: Esri, USGS, NOAA",
     });
 
     topoLayer.on("tileerror", () => {
