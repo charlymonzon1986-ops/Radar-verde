@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Camera, ImageOff, Upload, X } from "lucide-react";
+import { Camera, Download, ImageOff, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 import { fetchFotosByReserva, uploadReservaFoto } from "@/services/reservasService";
@@ -22,6 +22,34 @@ const PhotoGalleryModal = ({
   const [uploading, setUploading] = useState(false);
   const [autor, setAutor] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
+  const downloadFoto = async (foto: ReservaFoto) => {
+    if (!reserva) return;
+    const ext = (foto.url.split("?")[0].split(".").pop() || "jpg").toLowerCase();
+    const safeName = reserva.nombre
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .toLowerCase();
+    const fileName = `${safeName}-${foto.id.slice(0, 8)}.${ext.length > 4 ? "jpg" : ext}`;
+    try {
+      const res = await fetch(foto.url);
+      if (!res.ok) throw new Error("bad response");
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      // Si el navegador bloquea la descarga, se abre la foto para guardarla a mano
+      window.open(foto.url, "_blank", "noopener,noreferrer");
+    }
+  };
 
   useEffect(() => {
     if (!reserva) return;
@@ -156,11 +184,27 @@ const PhotoGalleryModal = ({
                           className="w-full h-28 object-cover rounded-xl border border-[#d8ccb8] bg-[#f5f0e8]"
                         />
                       )}
-                      {foto.autor && (
-                        <p className="text-[11px] text-[#3d2b1f]/75 truncate px-0.5">
-                          Por {foto.autor}
-                        </p>
-                      )}
+                      <div className="flex items-center justify-between gap-2 px-0.5">
+                        {foto.autor ? (
+                          <p className="text-[11px] text-[#3d2b1f]/75 truncate">
+                            Por {foto.autor}
+                          </p>
+                        ) : (
+                          <span />
+                        )}
+                        {!isBroken && (
+                          <button
+                            type="button"
+                            onClick={() => downloadFoto(foto)}
+                            title="Descargar foto"
+                            aria-label="Descargar foto"
+                            className="shrink-0 inline-flex items-center gap-1 text-[11px] text-[#4a7c4a] hover:text-[#2d4a2d] underline-offset-2 hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a7c4a] rounded"
+                          >
+                            <Download className="w-3 h-3" />
+                            Descargar
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })

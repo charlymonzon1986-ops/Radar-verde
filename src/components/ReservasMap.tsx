@@ -16,12 +16,12 @@ import PhotoGalleryModal from "./PhotoGalleryModal";
 import SearchBar from "./SearchBar";
 import ZoneFilterMenu from "./ZoneFilterMenu";
 
-const AMBA_CENTER: [number, number] = [-34.6037, -58.3816];
-const AMBA_DEFAULT_ZOOM = 12;
+// Encuadre que incluye CABA, zona norte (Pilar, Maschwitz, Tigre), Campana y Laferrere
+const AMBA_CENTER: [number, number] = [-34.55, -58.65];
+const AMBA_DEFAULT_ZOOM = 10;
 
-const ESRI_WORLD_TOPO_URL =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
-const OPENTOPOMAP_URL = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
+// Mapa base OpenStreetMap estándar (calles, parques, nombres). Crédito en el pie del sidebar
+const OSM_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 const buildParkSignPinSvg = (zoneColor: string) => `
 <svg viewBox="0 0 42 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -88,38 +88,32 @@ const ReservasMap = () => {
     };
   }, []);
 
-  // Inicializar mapa Leaflet con Esri World Topo (atenuado visualmente) y respaldo OpenTopoMap
+  // Inicializar mapa Leaflet con OpenStreetMap; la atribución va en el sidebar
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
       zoomControl: false,
+      attributionControl: false,
     }).setView(AMBA_CENTER, AMBA_DEFAULT_ZOOM);
     mapRef.current = map;
 
     L.control.zoom({ position: "bottomleft" }).addTo(map);
 
-    let switchedToFallback = false;
-    const topoLayer = L.tileLayer(ESRI_WORLD_TOPO_URL, {
-      maxZoom: 18,
-      className: "topo-tile-layer",
-      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community",
-    });
+    lightTilesRef.current = L.tileLayer(OSM_URL, {
+      maxZoom: 19,
+    }).addTo(map);
 
-    topoLayer.on("tileerror", () => {
-      if (!switchedToFallback) {
-        switchedToFallback = true;
-        topoLayer.setUrl(OPENTOPOMAP_URL);
-      }
-    });
-
-    lightTilesRef.current = topoLayer.addTo(map);
+    // Capa de nombres de calles de Esri encima de OSM, para tramos sin nombre en OpenStreetMap
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+      { maxZoom: 19, opacity: 0.85, pane: "overlayPane" }
+    ).addTo(map);
 
     darkTilesRef.current = L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
         maxZoom: 19,
-        attribution: "&copy; OpenStreetMap &copy; CARTO",
       }
     );
 
