@@ -113,11 +113,6 @@
   filter: saturate(1.15) brightness(1.02) contrast(0.96);
 }
 
-/* Nombres de calles: en gris suave y transparentes, para que no compitan con los pins */
-.labels-tile-layer {
-  filter: grayscale(1) brightness(1.9) contrast(0.85);
-  opacity: 0.55;
-}
 
 .leaflet-marker-pane {
   z-index: 620 !important;
