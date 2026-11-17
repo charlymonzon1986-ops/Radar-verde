@@ -102,12 +102,13 @@ const ReservasMap = () => {
 
     lightTilesRef.current = L.tileLayer(OSM_URL, {
       maxZoom: 19,
+      className: "osm-tile-layer",
     }).addTo(map);
 
     // Capa de nombres de calles de Esri encima de OSM, para tramos sin nombre en OpenStreetMap
     L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
-      { maxZoom: 19, opacity: 0.85, pane: "overlayPane" }
+      { maxZoom: 19, className: "labels-tile-layer", pane: "overlayPane" }
     ).addTo(map);
 
     darkTilesRef.current = L.tileLayer(

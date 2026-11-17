@@ -108,9 +108,15 @@
   background: #f5f0e8;
 }
 
-.topo-tile-layer {
-  filter: saturate(0.6) brightness(1.05) contrast(0.92);
-  opacity: 0.92;
+.osm-tile-layer {
+  /* Mapa base un poco más verde y cálido, sin lavar los parques */
+  filter: saturate(1.15) brightness(1.02) contrast(0.96);
+}
+
+/* Nombres de calles: en gris suave y transparentes, para que no compitan con los pins */
+.labels-tile-layer {
+  filter: grayscale(1) brightness(1.9) contrast(0.85);
+  opacity: 0.55;
 }
 
 .leaflet-marker-pane {
