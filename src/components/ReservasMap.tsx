@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { createRoot, Root } from "react-dom/client";
-import { LocateFixed, Moon, Sun, Trees } from "lucide-react";
+import { LocateFixed, Trees } from "lucide-react";
 import { toast } from "sonner";
 import { fetchReservas } from "@/services/reservasService";
 import {
@@ -48,7 +48,6 @@ const ReservasMap = () => {
   const markersMapRef = useRef<Map<string, L.Marker>>(new Map());
   const popupRootsRef = useRef<Root[]>([]);
   const lightTilesRef = useRef<L.TileLayer | null>(null);
-  const darkTilesRef = useRef<L.TileLayer | null>(null);
 
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +56,6 @@ const ReservasMap = () => {
   const [activeZona, setActiveZona] = useState<FiltroZona>("Todas");
   const [searchQuery, setSearchQuery] = useState("");
   const [galleryReserva, setGalleryReserva] = useState<Reserva | null>(null);
-  const [isDark, setIsDark] = useState(false);
 
   // Cargar reservas ecológicas desde Supabase
   useEffect(() => {
@@ -105,13 +103,6 @@ const ReservasMap = () => {
       className: "osm-tile-layer",
     }).addTo(map);
 
-    darkTilesRef.current = L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        maxZoom: 19,
-      }
-    );
-
     markersGroupRef.current.addTo(map);
 
     map.on("locationerror", () => {
@@ -125,11 +116,6 @@ const ReservasMap = () => {
       mapRef.current = null;
     };
   }, []);
-
-  // Sincronizar clase .dark en <html>
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
 
   const filteredReservas = useMemo(() => {
     const q = normalize(searchQuery);
@@ -212,20 +198,6 @@ const ReservasMap = () => {
     mapRef.current?.locate({ setView: true, maxZoom: 15 });
   };
 
-  const toggleDarkMode = () => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    if (isDark) {
-      if (darkTilesRef.current) map.removeLayer(darkTilesRef.current);
-      if (lightTilesRef.current) lightTilesRef.current.addTo(map);
-    } else {
-      if (lightTilesRef.current) map.removeLayer(lightTilesRef.current);
-      if (darkTilesRef.current) darkTilesRef.current.addTo(map);
-    }
-    setIsDark((prev) => !prev);
-  };
-
   const handlePhotoAdded = (reservaId: string, newPhoto: ReservaFoto) => {
     setReservas((prev) =>
       prev.map((item) =>
@@ -262,16 +234,6 @@ const ReservasMap = () => {
 
       {/* Controles flotantes del mapa */}
       <div className="absolute bottom-7 right-4 flex flex-col gap-2.5 z-[1000]">
-        <button
-          type="button"
-          onClick={toggleDarkMode}
-          title={isDark ? "Cambiar a mapa topográfico" : "Cambiar a mapa nocturno"}
-          aria-label={isDark ? "Cambiar a mapa topográfico" : "Cambiar a mapa nocturno"}
-          className="w-11 h-11 rounded-full bg-[#faf7f2] dark:bg-[#2d4a2d] border border-[#3d2b1f]/25 dark:border-[#c8a96e]/40 shadow-md flex items-center justify-center text-[#2d4a2d] dark:text-[#faf7f2] hover:bg-[#f5f0e8] dark:hover:bg-[#4a7c4a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a7c4a]"
-        >
-          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </button>
-
         <button
           type="button"
           onClick={handleLocateMe}
