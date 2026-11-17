@@ -20,10 +20,8 @@ import ZoneFilterMenu from "./ZoneFilterMenu";
 const AMBA_CENTER: [number, number] = [-34.55, -58.65];
 const AMBA_DEFAULT_ZOOM = 10;
 
-// Topo de Esri: relieve y vegetación. World_Terrain_Base no devolvía tiles en esta zona
-const ESRI_TOPO_URL =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
-const OPENTOPOMAP_URL = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
+// Mapa base claro estilo Google (calles, parques, nombres): CARTO Voyager, sin API key
+const VOYAGER_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
 
 const buildParkSignPinSvg = (zoneColor: string) => `
 <svg viewBox="0 0 42 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -90,45 +88,26 @@ const ReservasMap = () => {
     };
   }, []);
 
-  // Inicializar mapa Leaflet con Esri World Topo (atenuado visualmente) y respaldo OpenTopoMap
+  // Inicializar mapa Leaflet con CARTO Voyager (claro, calles y parques) sin texto de atribución visible
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
       zoomControl: false,
+      attributionControl: false,
     }).setView(AMBA_CENTER, AMBA_DEFAULT_ZOOM);
     mapRef.current = map;
 
     L.control.zoom({ position: "bottomleft" }).addTo(map);
 
-    let switchedToFallback = false;
-    const topoLayer = L.tileLayer(ESRI_TOPO_URL, {
-      maxZoom: 18,
-      className: "topo-tile-layer",
-      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, NOAA",
-    });
-
-    topoLayer.on("tileerror", () => {
-      if (!switchedToFallback) {
-        switchedToFallback = true;
-        topoLayer.setUrl(OPENTOPOMAP_URL);
-      }
-    });
-
-    lightTilesRef.current = topoLayer.addTo(map);
-
-    // Capa de referencia con nombres de calles (Esri World Transportation), encima del topo
-    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 18,
-      opacity: 0.9,
-      pane: "overlayPane",
+    lightTilesRef.current = L.tileLayer(VOYAGER_URL, {
+      maxZoom: 19,
     }).addTo(map);
 
     darkTilesRef.current = L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
         maxZoom: 19,
-        attribution: "&copy; OpenStreetMap &copy; CARTO",
       }
     );
 
