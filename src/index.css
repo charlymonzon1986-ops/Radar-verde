@@ -108,10 +108,7 @@
   background: #f5f0e8;
 }
 
-.topo-tile-layer {
-  filter: saturate(0.6) brightness(1.05) contrast(0.92);
-  opacity: 0.92;
-}
+
 
 .leaflet-marker-pane {
   z-index: 620 !important;
