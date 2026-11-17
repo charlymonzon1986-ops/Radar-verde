@@ -20,9 +20,9 @@ import ZoneFilterMenu from "./ZoneFilterMenu";
 const AMBA_CENTER: [number, number] = [-34.55, -58.65];
 const AMBA_DEFAULT_ZOOM = 10;
 
-// Terreno sombreado con vegetación y parques, sin nombres de calles (menos ruido visual)
-const ESRI_TERRAIN_URL =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}";
+// Topo de Esri: relieve y vegetación. World_Terrain_Base no devolvía tiles en esta zona
+const ESRI_TOPO_URL =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
 const OPENTOPOMAP_URL = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
 
 const buildParkSignPinSvg = (zoneColor: string) => `
@@ -102,11 +102,10 @@ const ReservasMap = () => {
     L.control.zoom({ position: "bottomleft" }).addTo(map);
 
     let switchedToFallback = false;
-    const topoLayer = L.tileLayer(ESRI_TERRAIN_URL, {
+    const topoLayer = L.tileLayer(ESRI_TOPO_URL, {
       maxZoom: 18,
-      maxNativeZoom: 13,
       className: "topo-tile-layer",
-      attribution: "Tiles &copy; Esri &mdash; Source: Esri, USGS, NOAA",
+      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, NOAA",
     });
 
     topoLayer.on("tileerror", () => {
