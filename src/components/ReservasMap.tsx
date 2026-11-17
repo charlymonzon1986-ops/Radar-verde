@@ -105,17 +105,36 @@ const ReservasMap = () => {
 
     markersGroupRef.current.addTo(map);
 
+    const refreshSize = () => map.invalidateSize();
+    window.addEventListener("resize", refreshSize);
+    window.addEventListener("orientationchange", refreshSize);
+    const sizeTimer = window.setTimeout(refreshSize, 300);
+
     map.on("locationerror", () => {
       toast.error("No pudimos obtener tu ubicación actual.");
     });
 
     return () => {
+      window.removeEventListener("resize", refreshSize);
+      window.removeEventListener("orientationchange", refreshSize);
+      window.clearTimeout(sizeTimer);
       popupRootsRef.current.forEach((root) => root.unmount());
       popupRootsRef.current = [];
       map.remove();
       mapRef.current = null;
     };
   }, []);
+
+  // Encuadrar todas las reservas al cargar, para que en el celular se vea el conjunto completo
+  const fittedRef = useRef(false);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || fittedRef.current || reservas.length === 0) return;
+    const bounds = L.latLngBounds(reservas.map((r) => r.coordenadas));
+    map.invalidateSize();
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+    fittedRef.current = true;
+  }, [reservas]);
 
   const filteredReservas = useMemo(() => {
     const q = normalize(searchQuery);
@@ -216,7 +235,7 @@ const ReservasMap = () => {
   const showEmptyNotice = !loading && filteredReservas.length === 0;
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-background">
+    <main className="relative w-full h-screen h-[100dvh] overflow-hidden bg-background">
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Barra de búsqueda superior */}
