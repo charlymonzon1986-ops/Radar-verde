@@ -148,6 +148,9 @@ const ZoneFilterMenu = ({ activeZona, onZonaChange }: ZoneFilterMenuProps) => {
           );
         })}
       </div>
+      <p className="mt-3 pt-2 border-t border-[#faf7f2]/15 text-[10px] leading-snug text-[#c8a96e]">
+        Mapa © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline">OpenStreetMap</a> contributors
+      </p>
     </aside>
   );
 };

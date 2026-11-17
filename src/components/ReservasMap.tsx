@@ -20,8 +20,8 @@ import ZoneFilterMenu from "./ZoneFilterMenu";
 const AMBA_CENTER: [number, number] = [-34.55, -58.65];
 const AMBA_DEFAULT_ZOOM = 10;
 
-// Mapa base claro estilo Google (calles, parques, nombres): CARTO Voyager, sin API key
-const VOYAGER_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+// Mapa base OpenStreetMap estándar (calles, parques, nombres). Crédito en el pie del sidebar
+const OSM_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 const buildParkSignPinSvg = (zoneColor: string) => `
 <svg viewBox="0 0 42 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -88,7 +88,7 @@ const ReservasMap = () => {
     };
   }, []);
 
-  // Inicializar mapa Leaflet con CARTO Voyager (claro, calles y parques) sin texto de atribución visible
+  // Inicializar mapa Leaflet con OpenStreetMap; la atribución va en el sidebar
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
@@ -100,7 +100,7 @@ const ReservasMap = () => {
 
     L.control.zoom({ position: "bottomleft" }).addTo(map);
 
-    lightTilesRef.current = L.tileLayer(VOYAGER_URL, {
+    lightTilesRef.current = L.tileLayer(OSM_URL, {
       maxZoom: 19,
     }).addTo(map);
 
