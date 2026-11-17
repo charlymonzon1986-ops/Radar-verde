@@ -117,6 +117,13 @@ const ReservasMap = () => {
 
     lightTilesRef.current = topoLayer.addTo(map);
 
+    // Capa de referencia con nombres de calles (Esri World Transportation), encima del topo
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 18,
+      opacity: 0.9,
+      pane: "overlayPane",
+    }).addTo(map);
+
     darkTilesRef.current = L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
