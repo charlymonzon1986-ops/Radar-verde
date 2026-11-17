@@ -108,10 +108,6 @@
   background: #f5f0e8;
 }
 
-.osm-tile-layer {
-  /* Mapa base un poco más verde y cálido, sin lavar los parques */
-  filter: saturate(1.15) brightness(1.02) contrast(0.96);
-}
 
 
 .leaflet-marker-pane {
